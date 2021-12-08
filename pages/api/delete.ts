@@ -3,21 +3,15 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { MongoClient } from "mongodb";
 import { Tree } from "../../types";
-
-function removeNodes(tree: Tree, idToRemove: string): Tree {
-  return {
-    ...tree,
-    children: tree.children
-      .filter((child) => child.id !== idToRemove)
-      .map((child) => removeNodes(child, idToRemove)),
-  };
-}
+import { removeNodes } from "../../utils";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const { id } = req.body;
+
+  const idsToDelete = Array.isArray(id) ? id : [id];
 
   const pwd = encodeURIComponent(process.env.DB_PWD as string);
   const user = encodeURIComponent(process.env.DB_USER as string);
@@ -38,7 +32,7 @@ export default async function handler(
 
   const oldTree = (await treeview.findOne(query)) as unknown as Tree;
 
-  const newTree = removeNodes(oldTree, id);
+  const newTree = removeNodes(oldTree, ...idsToDelete);
 
   const result = await treeview.replaceOne(query, newTree);
 

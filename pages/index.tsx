@@ -4,12 +4,14 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import Head from "next/head";
+import { removeNodes } from "../utils";
 
 type Tree<T extends Record<string, unknown> = Record<string, never>> = {
   id: string;
@@ -70,6 +72,23 @@ function updateNodeSelectStatus(
   return selected;
 }
 
+function getRootSelectedNodes(tree: Tree, selected: SelectedState): string[] {
+  let selectedIds: string[] = [];
+
+  function traverse(tree: Tree) {
+    const isTreeSelected = selected[tree.id] === "checked";
+    if (isTreeSelected) {
+      selectedIds.push(tree.id);
+    } else {
+      tree.children.forEach((child) => traverse(child));
+    }
+  }
+
+  traverse(tree);
+
+  return selectedIds;
+}
+
 type SelectedState = {
   [id: string]: "checked" | "unchecked" | "indeterminate";
 };
@@ -77,6 +96,7 @@ type SelectedState = {
 type TreeContext = {
   selected: SelectedState;
   selectNode: (id: string, status: "checked" | "unchecked") => void;
+  rootSelectedNodes: string[];
 };
 const TreeContext = createContext<TreeContext | undefined>(undefined);
 function useTree() {
@@ -101,8 +121,12 @@ function TreeProvider({
     },
     [data]
   );
+  const rootSelectedNodes = useMemo(
+    () => getRootSelectedNodes(data, selected),
+    [data, selected]
+  );
 
-  const contextValue = { selected, selectNode };
+  const contextValue = { selected, selectNode, rootSelectedNodes };
 
   return (
     <TreeContext.Provider value={contextValue}>{children}</TreeContext.Provider>
@@ -134,7 +158,14 @@ function Home() {
         {query.isLoading ? <div>Loading...</div> : null}
         {query.isSuccess ? (
           <TreeProvider data={query.data}>
-            <ul>
+            <BulkActions />
+            <ul
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+              }}
+            >
               <ListItem item={query.data} />
             </ul>
           </TreeProvider>
@@ -146,6 +177,51 @@ function Home() {
 
 export default Home;
 
+function BulkActions(): JSX.Element {
+  const { rootSelectedNodes } = useTree();
+
+  const queryClient = useQueryClient();
+
+  const bulkDeleteMutation = useMutation(
+    (id: string[]) => {
+      return fetch("/api/delete", {
+        body: JSON.stringify({ id }),
+        method: "DELETE",
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+    },
+    {
+      onMutate: async (ids) => {
+        await queryClient.cancelQueries("tags");
+        const existingData = queryClient.getQueryData("tags") as Tree;
+
+        const updatedData = removeNodes(existingData, ...ids);
+        queryClient.setQueryData("tags", updatedData);
+
+        return { existingData };
+      },
+      onError: (err, id, context) => {
+        queryClient.setQueryData("tags", (context as any).existingData);
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries("tags");
+      },
+    }
+  );
+
+  return rootSelectedNodes.length > 0 ? (
+    <div>
+      <button onClick={() => bulkDeleteMutation.mutate(rootSelectedNodes)}>
+        Delete Selected
+      </button>
+    </div>
+  ) : (
+    <></>
+  );
+}
+
 type ListItemProps = {
   item: Tree;
 };
@@ -156,34 +232,62 @@ function ListItem({ item }: ListItemProps): JSX.Element {
   const { selected, selectNode } = useTree();
   const status = selected[item.id] ?? "unchecked";
 
-  const deleteMutation = useMutation((id: string) => {
-    return fetch("/api/delete", {
-      body: JSON.stringify({ id }),
-      method: "DELETE",
-      headers: {
-        "content-type": "application/json",
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation(
+    (id: string) => {
+      return fetch("/api/delete", {
+        body: JSON.stringify({ id }),
+        method: "DELETE",
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+    },
+    {
+      onMutate: async (id) => {
+        await queryClient.cancelQueries("tags");
+        const existingData = queryClient.getQueryData("tags") as Tree;
+
+        const updatedData = removeNodes(existingData, id);
+        queryClient.setQueryData("tags", updatedData);
+
+        return { existingData };
       },
-    });
-  });
+      onError: (err, id, context) => {
+        queryClient.setQueryData("tags", (context as any).existingData);
+      },
+      onSettled: () => {
+        queryClient.invalidateQueries("tags");
+      },
+    }
+  );
 
   return (
     <li>
-      <label>
-        <Checkbox
-          status={status}
-          onChange={(newStatus) => {
-            selectNode(item.id, newStatus);
-          }}
-        />
-        {item.name}
-      </label>
-      {hasChildren ? ` (${item.children.length})` : null}
-      {hasChildren ? (
-        <button onClick={toggleIsExpanded}>{isExpanded ? "-" : "+"}</button>
-      ) : null}
-      <button onClick={() => deleteMutation.mutate(item.id)}>Delete</button>
+      <div style={{ display: "flex", paddingRight: "4rem" }}>
+        <label>
+          <Checkbox
+            status={status}
+            onChange={(newStatus) => {
+              selectNode(item.id, newStatus);
+            }}
+          />
+          {item.name}
+        </label>
+        {hasChildren ? ` (${item.children.length})` : null}
+        {hasChildren ? (
+          <button onClick={toggleIsExpanded}>{isExpanded ? "-" : "+"}</button>
+        ) : null}
+        <button
+          onClick={() => deleteMutation.mutate(item.id)}
+          style={{ marginLeft: "auto" }}
+        >
+          Delete
+        </button>
+      </div>
       {hasChildren && isExpanded ? (
-        <ul>
+        <ul style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           {item.children.map((child) => (
             <ListItem key={child.id} item={child} />
           ))}
