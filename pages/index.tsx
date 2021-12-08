@@ -26,6 +26,7 @@ function updateNodeSelectStatus(
   const selected = { ...initialSelected };
 
   function selectTree(tree: Tree) {
+    // when setting the status of a parent, we recursively set the same status on its children
     selected[tree.id] = status;
     tree.children.forEach((child) => {
       selectTree(child);
@@ -33,14 +34,20 @@ function updateNodeSelectStatus(
   }
 
   function traverse(tree: Tree) {
+    // traverse the tree recursively looking for the id we're updating
     if (tree.id === id) {
+      // if we've found it select the whole subtree
       selectTree(tree);
     } else {
+      // otherwise look through the children
       tree.children.forEach((child) => {
         traverse(child);
       });
 
-      // now we've updated the children, set the parent's status
+      // now we've potentially updated the children, set the parent's status
+      // all children checked -> parent is checked
+      // all children unchecked  -> parent is unchecked
+      // some children checked or indeterminate -> parent is indeterminate
       const childStatuses = tree.children.map((child) => selected[child.id]);
       if (tree.children.length > 0) {
         if (childStatuses.every((status) => status === "checked")) {
