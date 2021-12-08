@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import data from "../../data1L10N.json";
+import data from "../../data2L1000N.json";
 
 type Tree<T> = {
   id: string;

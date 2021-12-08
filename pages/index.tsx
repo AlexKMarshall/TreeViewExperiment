@@ -8,9 +8,7 @@ import {
   useState,
 } from "react";
 
-import type { GetServerSideProps } from "next";
 import Head from "next/head";
-import myData from "../data1L10N.json";
 import { useQuery } from "react-query";
 
 type Tree<T extends Record<string, unknown> = Record<string, never>> = {
@@ -18,14 +16,6 @@ type Tree<T extends Record<string, unknown> = Record<string, never>> = {
   name: string;
   children: Tree<T>[];
 } & T;
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  return {
-    props: {
-      data: myData,
-    },
-  };
-};
 
 function updateNodeSelectStatus(
   tree: Tree,
@@ -156,16 +146,19 @@ function ListItem({ item }: ListItemProps): JSX.Element {
 
   return (
     <li>
-      {item.name}
+      <label>
+        <Checkbox
+          status={status}
+          onChange={(newStatus) => {
+            selectNode(item.id, newStatus);
+          }}
+        />
+        {item.name}
+      </label>
+      {hasChildren ? ` (${item.children.length})` : null}
       {hasChildren ? (
         <button onClick={toggleIsExpanded}>{isExpanded ? "-" : "+"}</button>
       ) : null}
-      <Checkbox
-        status={status}
-        onChange={(newStatus) => {
-          selectNode(item.id, newStatus);
-        }}
-      />
       {hasChildren && isExpanded ? (
         <ul>
           {item.children.map((child) => (
