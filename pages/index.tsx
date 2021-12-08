@@ -7,9 +7,9 @@ import {
   useRef,
   useState,
 } from "react";
+import { useMutation, useQuery } from "react-query";
 
 import Head from "next/head";
-import { useQuery } from "react-query";
 
 type Tree<T extends Record<string, unknown> = Record<string, never>> = {
   id: string;
@@ -111,8 +111,13 @@ function TreeProvider({
 
 function Home() {
   const query = useQuery("tags", async () => {
-    const res = await fetch("/api");
-    return (await res.json()) as Tree;
+    try {
+      const res = await fetch("/api");
+      const data = (await res.json()) as Tree;
+      return data;
+    } catch (error) {
+      throw error;
+    }
   });
 
   return (
@@ -151,6 +156,16 @@ function ListItem({ item }: ListItemProps): JSX.Element {
   const { selected, selectNode } = useTree();
   const status = selected[item.id] ?? "unchecked";
 
+  const deleteMutation = useMutation((id: string) => {
+    return fetch("/api/delete", {
+      body: JSON.stringify({ id }),
+      method: "DELETE",
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+  });
+
   return (
     <li>
       <label>
@@ -166,6 +181,7 @@ function ListItem({ item }: ListItemProps): JSX.Element {
       {hasChildren ? (
         <button onClick={toggleIsExpanded}>{isExpanded ? "-" : "+"}</button>
       ) : null}
+      <button onClick={() => deleteMutation.mutate(item.id)}>Delete</button>
       {hasChildren && isExpanded ? (
         <ul>
           {item.children.map((child) => (
