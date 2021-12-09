@@ -1,0 +1,112 @@
+{
+  "type": "tree",
+  "id": "edd10eae-cd6e-44d0-a95c-32fa8287faad",
+  "name": "Awesome Metal Mouse",
+  "color": "ffd7ba",
+  "children": [
+    {
+      "type": "tree",
+      "id": "8132fd75-6d94-4714-bd6a-975194a38e29",
+      "name": "Refined Wooden Keyboard",
+      "color": "fcd5ce",
+      "children": [
+        {
+          "type": "tree",
+          "id": "7897b928-7829-4ed9-89e2-511a77fb9285",
+          "name": "Sleek Frozen Car",
+          "color": "ffe5d9",
+          "children": [
+            {
+              "type": "leaf",
+              "id": "0eaa0f34-5d91-4460-9a31-35298feba6f8",
+              "name": "Gorgeous Soft Fish",
+              "isTraining": true,
+              "secondaryInformation": "virtual"
+            },
+            {
+              "type": "leaf",
+              "id": "9487e479-b8b8-41c1-b963-73b2cc2b4295",
+              "name": "Handmade Rubber Bacon",
+              "isTraining": false,
+              "secondaryInformation": "scalable"
+            }
+          ]
+        },
+        {
+          "type": "tree",
+          "id": "2903d1e0-0bd4-4e4e-bf31-116078b00847",
+          "name": "Gorgeous Plastic Soap",
+          "color": "ece4db",
+          "children": [
+            {
+              "type": "leaf",
+              "id": "dbd16c78-adb7-446a-90a1-53ea82850ef0",
+              "name": "Licensed Frozen Chips",
+              "isTraining": false,
+              "secondaryInformation": "front-end"
+            },
+            {
+              "type": "leaf",
+              "id": "bb77ce31-a0cc-4568-8103-b3688038b374",
+              "name": "Practical Granite Chair",
+              "isTraining": true,
+              "secondaryInformation": "bricks-and-clicks"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "tree",
+      "id": "8ab14042-a217-4a2c-9e3a-7626915c4df4",
+      "name": "Awesome Fresh Shirt",
+      "color": "fec5bb",
+      "children": [
+        {
+          "type": "tree",
+          "id": "78869c53-d9dc-45f8-aea3-6e8d4960f64b",
+          "name": "Incredible Soft Shoes",
+          "color": "d8e2dc",
+          "children": [
+            {
+              "type": "leaf",
+              "id": "51680ef4-4e4a-4e7e-a937-6d101f92ab79",
+              "name": "Ergonomic Metal Pizza",
+              "isTraining": false,
+              "secondaryInformation": "leading-edge"
+            },
+            {
+              "type": "leaf",
+              "id": "3ef67991-5221-450e-b640-111676004c21",
+              "name": "Ergonomic Granite Salad",
+              "isTraining": true,
+              "secondaryInformation": "integrated"
+            }
+          ]
+        },
+        {
+          "type": "tree",
+          "id": "f0aab277-3f44-4395-9675-ea62a57b2db8",
+          "name": "Awesome Plastic Sausages",
+          "color": "ffe5d9",
+          "children": [
+            {
+              "type": "leaf",
+              "id": "ebee36ec-ffca-4330-a4e9-0e57d6f82587",
+              "name": "Ergonomic Granite Fish",
+              "isTraining": false,
+              "secondaryInformation": "robust"
+            },
+            {
+              "type": "leaf",
+              "id": "baddf94b-5b09-4a03-a0ca-f92591611efb",
+              "name": "Handmade Cotton Hat",
+              "isTraining": true,
+              "secondaryInformation": "24/365"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

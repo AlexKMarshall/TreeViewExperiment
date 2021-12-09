@@ -1,13 +1,14 @@
+import { NewTreeWithCount, TreeWithCount } from "../types";
+
 import Head from "next/head";
 import { TreeTable } from "../components/tree-view";
-import { TreeWithCount } from "../types";
 import { useQuery } from "react-query";
 
 function Home() {
   const query = useQuery("tags", async () => {
     try {
       const res = await fetch("/api");
-      const data = (await res.json()) as TreeWithCount;
+      const data = (await res.json()) as NewTreeWithCount;
       return data;
     } catch (error) {
       throw error;

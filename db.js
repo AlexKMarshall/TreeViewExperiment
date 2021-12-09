@@ -6,7 +6,7 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
 });
 
-const data = require("./data4L100N.json");
+const data = require("./data4L2N.json");
 
 // client.connect((err) => {
 //   const collection = client.db("test").collection("devices");

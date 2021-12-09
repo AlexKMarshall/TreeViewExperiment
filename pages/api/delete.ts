@@ -1,9 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { Tree } from "../../types";
+import { NewTree } from "../../types";
 import { clientPromise } from "../../mongodb-client";
-import { removeNodes } from "../../utils";
+import { newRemoveNodes } from "../../utils";
 import { treeId } from ".";
 
 export default async function handler(
@@ -22,11 +22,14 @@ export default async function handler(
     id: treeId,
   };
 
-  const oldTree = (await treeview.findOne(query)) as unknown as Tree;
+  const oldTree = (await treeview.findOne(query)) as unknown as NewTree;
 
-  const newTree = removeNodes(oldTree, ...idsToDelete);
+  const newTree = newRemoveNodes(oldTree, ...idsToDelete);
 
-  const result = (await treeview.replaceOne(query, newTree)) as unknown as Tree;
+  const result = (await treeview.replaceOne(
+    query,
+    newTree
+  )) as unknown as NewTree;
 
   res
     .status(200)

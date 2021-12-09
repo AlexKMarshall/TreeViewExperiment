@@ -1,0 +1,13 @@
+.table {
+  border-collapse: collapse;
+  width: "100%";
+}
+
+.table td {
+  margin-top: 0.25rem;
+  border-bottom: 0.25rem solid white;
+}
+
+.leafRow:nth-child(even) {
+  background-color: #e4cfd3;
+}

@@ -1,12 +1,22 @@
 const faker = require("faker");
 const fs = require("fs");
 
-function buildNode() {
-  return {
-    id: faker.datatype.uuid(),
-    name: faker.commerce.productName(),
-    children: [],
-  };
+const colors = [
+  "fec5bb",
+  "fcd5ce",
+  "fae1dd",
+  "f8edeb",
+  "e8e8e4",
+  "d8e2dc",
+  "ece4db",
+  "ffe5d9",
+  "ffd7ba",
+  "fec89a",
+];
+
+function randomColor() {
+  const randomIndex = Math.floor(Math.random() * colors.length);
+  return colors[randomIndex];
 }
 
 function buildTree() {
@@ -14,7 +24,7 @@ function buildTree() {
     type: "tree",
     id: faker.datatype.uuid(),
     name: faker.commerce.productName(),
-    color: faker.internet.color(),
+    color: randomColor(),
     children: [],
   };
 }
@@ -30,19 +40,19 @@ function buildLeaf() {
 }
 
 const data = buildTree();
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 2; i++) {
   data.children.push(buildTree());
 }
 for (const child of data.children) {
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 2; i++) {
     child.children.push(buildTree());
   }
 
   for (const grandchild of child.children) {
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 2; i++) {
       grandchild.children.push(buildLeaf());
     }
   }
 }
 
-fs.writeFileSync("data4L100N.json", JSON.stringify(data));
+fs.writeFileSync("data4L2N.json", JSON.stringify(data));
