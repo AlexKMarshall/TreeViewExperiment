@@ -2,8 +2,8 @@ import { NewTree, Tree } from "../../types";
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { appendCountToTree } from "../../utils";
 import { clientPromise } from "../../mongodb-client";
-import { newAppendCountToTree } from "../../utils";
 
 export const treeId = "3280f3b4-69df-4a79-9117-f7b0c4bf2857";
 
@@ -19,7 +19,7 @@ export default async function handler(
     id: treeId,
   })) as unknown as NewTree;
 
-  const enrichedTree = newAppendCountToTree(tree);
+  const enrichedTree = appendCountToTree(tree);
 
   res.status(200).json(enrichedTree);
 }

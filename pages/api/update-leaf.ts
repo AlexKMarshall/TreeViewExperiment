@@ -1,18 +1,16 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
+import { removeNodes, updateLeaf } from "../../utils";
 
 import { NewTree } from "../../types";
 import { clientPromise } from "../../mongodb-client";
-import { removeNodes } from "../../utils";
 import { treeId } from ".";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { id } = req.body;
-
-  const idsToDelete = Array.isArray(id) ? id : [id];
+  const { id, ...updatedFields } = req.body;
 
   const client = await clientPromise;
   const database = client.db("treeviewDB");
@@ -24,14 +22,12 @@ export default async function handler(
 
   const oldTree = (await treeview.findOne(query)) as unknown as NewTree;
 
-  const newTree = removeNodes(oldTree, ...idsToDelete);
+  const newTree = updateLeaf(oldTree, id, updatedFields);
 
   const result = (await treeview.replaceOne(
     query,
     newTree
   )) as unknown as NewTree;
 
-  res
-    .status(200)
-    .json({ message: `nodes deleted: $${idsToDelete.join(", ")}` });
+  res.status(200).json({ message: `leaf updated` });
 }

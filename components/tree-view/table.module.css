@@ -11,3 +11,19 @@
 .leafRow:nth-child(even) {
   background-color: #e4cfd3;
 }
+
+.dialog {
+  max-width: 500px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}

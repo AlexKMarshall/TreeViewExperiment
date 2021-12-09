@@ -12,6 +12,7 @@
     "@emotion/styled": "^11.6.0",
     "@mui/lab": "^5.0.0-alpha.59",
     "@mui/material": "^5.2.3",
+    "@reach/dialog": "^0.16.2",
     "@types/faker": "^5.5.9",
     "faker": "^5.5.3",
     "mongodb": "^4.2.1",
