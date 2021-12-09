@@ -1,3 +1,4 @@
+import { Leaf, NewTreeWithCount } from "../../types";
 import {
   ReactNode,
   createContext,
@@ -7,32 +8,32 @@ import {
   useState,
 } from "react";
 
-import { Tree } from "../../types";
-
 function updateNodeSelectStatus(
-  tree: Tree,
+  tree: NewTreeWithCount,
   initialSelected: SelectedState,
   id: string,
   status: "checked" | "unchecked"
 ): SelectedState {
   const selected = { ...initialSelected };
 
-  function selectTree(tree: Tree) {
+  function selectNode(node: NewTreeWithCount | Leaf) {
+    selected[node.id] = status;
     // when setting the status of a parent, we recursively set the same status on its children
-    selected[tree.id] = status;
-    tree.children.forEach((child) => {
-      selectTree(child);
-    });
+    if (node.type === "tree") {
+      node.children.forEach((child) => {
+        selectNode(child);
+      });
+    }
   }
 
-  function traverse(tree: Tree) {
+  function traverse(node: NewTreeWithCount | Leaf) {
     // traverse the tree recursively looking for the id we're updating
-    if (tree.id === id) {
+    if (node.id === id) {
       // if we've found it select the whole subtree
-      selectTree(tree);
-    } else {
+      selectNode(node);
+    } else if (node.type === "tree") {
       // otherwise look through the children
-      tree.children.forEach((child) => {
+      node.children.forEach((child) => {
         traverse(child);
       });
 
@@ -40,21 +41,22 @@ function updateNodeSelectStatus(
       // all children checked -> parent is checked
       // all children unchecked  -> parent is unchecked
       // some children checked or indeterminate -> parent is indeterminate
-      const childStatuses = tree.children.map((child) => selected[child.id]);
-      if (tree.children.length > 0) {
+      const childStatuses = node.children.map((child) => selected[child.id]);
+      if (node.children.length > 0) {
         if (childStatuses.every((status) => status === "checked")) {
-          selected[tree.id] = "checked";
+          selected[node.id] = "checked";
         } else if (
           childStatuses.some(
             (status) => status === "checked" || status === "indeterminate"
           )
         ) {
-          selected[tree.id] = "indeterminate";
+          selected[node.id] = "indeterminate";
         } else {
-          selected[tree.id] = "unchecked";
+          selected[node.id] = "unchecked";
         }
       }
     }
+    // else if it's a leaf and not the one we're looking for, do nothing
   }
 
   traverse(tree);
@@ -62,15 +64,20 @@ function updateNodeSelectStatus(
   return selected;
 }
 
-function getSelectedBranchNodes(tree: Tree, selected: SelectedState): string[] {
+function getSelectedBranchNodes(
+  tree: NewTreeWithCount,
+  selected: SelectedState
+): string[] {
   let selectedIds: string[] = [];
 
-  function traverse(tree: Tree) {
-    const isTreeSelected = selected[tree.id] === "checked";
+  function traverse(node: NewTreeWithCount | Leaf) {
+    const isTreeSelected = selected[node.id] === "checked";
     if (isTreeSelected) {
-      selectedIds.push(tree.id);
-    } else {
-      tree.children.forEach((child) => traverse(child));
+      selectedIds.push(node.id);
+    } else if (node.type === "tree") {
+      node.children.forEach((child) => {
+        traverse(child);
+      });
     }
   }
 
@@ -101,7 +108,7 @@ export function TreeProvider({
   data,
   children,
 }: {
-  data: Tree;
+  data: NewTreeWithCount;
   children: ReactNode;
 }): JSX.Element {
   const [selected, setSelected] = useState<SelectedState>({});

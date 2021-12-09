@@ -1,30 +1,25 @@
+import { NewTree, Tree } from "../../types";
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { MongoClient } from "mongodb";
+import { clientPromise } from "../../mongodb-client";
+import { newAppendCountToTree } from "../../utils";
 
-export const treeId = "1450e54e-e324-4361-8fb3-9bcc236ac9c3";
+export const treeId = "3280f3b4-69df-4a79-9117-f7b0c4bf2857";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const pwd = encodeURIComponent(process.env.DB_PWD as string);
-  const user = encodeURIComponent(process.env.DB_USER as string);
-  const uri = `mongodb+srv://${user}:${pwd}@cluster0.ci7wt.mongodb.net/treeviewDB?retryWrites=true&w=majority`;
-  const client = new MongoClient(uri, {
-    // @ts-ignore
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-
-  await client.connect();
+  const client = await clientPromise;
   const database = client.db("treeviewDB");
   const treeview = database.collection("treeview");
 
-  const tree = await treeview.findOne({
+  const tree = (await treeview.findOne({
     id: treeId,
-  });
+  })) as unknown as NewTree;
 
-  res.status(200).json(tree);
+  const enrichedTree = newAppendCountToTree(tree);
+
+  res.status(200).json(enrichedTree);
 }
