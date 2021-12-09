@@ -19,6 +19,7 @@ export type NewTree<T extends Record<string, unknown> = Record<string, never>> =
     type: "tree";
     id: string;
     name: string;
+    color: string;
     children: Array<NewTree<T> | Leaf>;
   } & T;
 

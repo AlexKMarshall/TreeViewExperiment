@@ -9,18 +9,38 @@ function buildNode() {
   };
 }
 
-const data = buildNode();
+function buildTree() {
+  return {
+    type: "tree",
+    id: faker.datatype.uuid(),
+    name: faker.commerce.productName(),
+    color: faker.internet.color(),
+    children: [],
+  };
+}
+
+function buildLeaf() {
+  return {
+    type: "leaf",
+    id: faker.datatype.uuid(),
+    name: faker.commerce.productName(),
+    isTraining: faker.datatype.boolean(),
+    secondaryInformation: faker.company.bsAdjective(),
+  };
+}
+
+const data = buildTree();
 for (let i = 0; i < 5; i++) {
-  data.children.push(buildNode());
+  data.children.push(buildTree());
 }
 for (const child of data.children) {
   for (let i = 0; i < 10; i++) {
-    child.children.push(buildNode());
+    child.children.push(buildTree());
   }
 
   for (const grandchild of child.children) {
     for (let i = 0; i < 100; i++) {
-      grandchild.children.push(buildNode());
+      grandchild.children.push(buildLeaf());
     }
   }
 }

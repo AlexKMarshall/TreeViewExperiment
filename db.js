@@ -20,10 +20,7 @@ async function run() {
     const database = client.db("treeviewDB");
     const treview = database.collection("treeview");
 
-    const result = await treview.replaceOne(
-      { id: "e8f9c4e1-f7ea-4b0f-9765-14e71f7e7895" },
-      data
-    );
+    const result = await treview.insertOne(data);
 
     // const result = await treview.insertOne(bigDoc);
     console.log(result);
