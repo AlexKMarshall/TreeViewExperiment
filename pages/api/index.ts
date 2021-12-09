@@ -2,6 +2,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { MongoClient } from "mongodb";
+import { Tree } from "../../types";
+import { appendCountToTree } from "../../utils";
 
 export const treeId = "1450e54e-e324-4361-8fb3-9bcc236ac9c3";
 
@@ -22,9 +24,11 @@ export default async function handler(
   const database = client.db("treeviewDB");
   const treeview = database.collection("treeview");
 
-  const tree = await treeview.findOne({
+  const tree = (await treeview.findOne({
     id: treeId,
-  });
+  })) as unknown as Tree;
 
-  res.status(200).json(tree);
+  const enrichedTree = appendCountToTree(tree);
+
+  res.status(200).json(enrichedTree);
 }

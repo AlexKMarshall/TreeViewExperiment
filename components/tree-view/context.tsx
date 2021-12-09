@@ -7,17 +7,17 @@ import {
   useState,
 } from "react";
 
-import { Tree } from "../../types";
+import { TreeWithCount } from "../../types";
 
 function updateNodeSelectStatus(
-  tree: Tree,
+  tree: TreeWithCount,
   initialSelected: SelectedState,
   id: string,
   status: "checked" | "unchecked"
 ): SelectedState {
   const selected = { ...initialSelected };
 
-  function selectTree(tree: Tree) {
+  function selectTree(tree: TreeWithCount) {
     // when setting the status of a parent, we recursively set the same status on its children
     selected[tree.id] = status;
     tree.children.forEach((child) => {
@@ -25,7 +25,7 @@ function updateNodeSelectStatus(
     });
   }
 
-  function traverse(tree: Tree) {
+  function traverse(tree: TreeWithCount) {
     // traverse the tree recursively looking for the id we're updating
     if (tree.id === id) {
       // if we've found it select the whole subtree
@@ -62,10 +62,13 @@ function updateNodeSelectStatus(
   return selected;
 }
 
-function getSelectedBranchNodes(tree: Tree, selected: SelectedState): string[] {
+function getSelectedBranchNodes(
+  tree: TreeWithCount,
+  selected: SelectedState
+): string[] {
   let selectedIds: string[] = [];
 
-  function traverse(tree: Tree) {
+  function traverse(tree: TreeWithCount) {
     const isTreeSelected = selected[tree.id] === "checked";
     if (isTreeSelected) {
       selectedIds.push(tree.id);
@@ -101,7 +104,7 @@ export function TreeProvider({
   data,
   children,
 }: {
-  data: Tree;
+  data: TreeWithCount;
   children: ReactNode;
 }): JSX.Element {
   const [selected, setSelected] = useState<SelectedState>({});

@@ -1,5 +1,7 @@
-export type Tree = {
+export type Tree<T extends Record<string, unknown> = Record<string, never>> = {
   id: string;
   name: string;
-  children: Tree[];
-};
+  children: Tree<T>[];
+} & T;
+
+export type TreeWithCount = Tree<{ count: number }>;

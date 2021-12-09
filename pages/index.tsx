@@ -1,13 +1,13 @@
 import Head from "next/head";
-import { Tree } from "../types";
-import { TreeView } from "../components/tree-view";
+import { TreeTable } from "../components/tree-view";
+import { TreeWithCount } from "../types";
 import { useQuery } from "react-query";
 
 function Home() {
   const query = useQuery("tags", async () => {
     try {
       const res = await fetch("/api");
-      const data = (await res.json()) as Tree;
+      const data = (await res.json()) as TreeWithCount;
       return data;
     } catch (error) {
       throw error;
@@ -29,7 +29,7 @@ function Home() {
         {query.isError ? (
           <pre>Error: {JSON.stringify(query.error, null, 2)}</pre>
         ) : null}
-        {query.isSuccess ? <TreeView data={query.data} /> : null}
+        {query.isSuccess ? <TreeTable data={query.data} /> : null}
       </main>
     </>
   );

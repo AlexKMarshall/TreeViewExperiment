@@ -1,9 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
+import { appendCountToTree, removeNodes } from "../../utils";
 
 import { MongoClient } from "mongodb";
 import { Tree } from "../../types";
-import { removeNodes } from "../../utils";
 import { treeId } from ".";
 
 export default async function handler(
@@ -35,7 +35,9 @@ export default async function handler(
 
   const newTree = removeNodes(oldTree, ...idsToDelete);
 
-  const result = await treeview.replaceOne(query, newTree);
+  const result = (await treeview.replaceOne(query, newTree)) as unknown as Tree;
 
-  res.status(200).json(result);
+  res
+    .status(200)
+    .json({ message: `nodes deleted: $${idsToDelete.join(", ")}` });
 }

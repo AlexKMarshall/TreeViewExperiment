@@ -1,15 +1,15 @@
 import React, { useState } from "react";
+import { Tree, TreeWithCount } from "../../types";
 import { TreeProvider, useTree } from "./context";
+import { appendCountToTree, removeNodes } from "../../utils";
 import { useMutation, useQueryClient } from "react-query";
 
 import { Checkbox } from "../checkbox";
-import { Tree } from "../../types";
-import { removeNodes } from "../../utils";
 
 type Props = {
-  data: Tree;
+  data: TreeWithCount;
 };
-export function TreeView({ data }: Props): JSX.Element {
+export function TreeTable({ data }: Props): JSX.Element {
   return (
     <TreeProvider data={data}>
       <BulkActions />
@@ -22,23 +22,15 @@ export function TreeView({ data }: Props): JSX.Element {
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody></tbody>
-
-        {/* <ul
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "0.5rem",
-        }}
-        > */}
-        <InnerTree data={data} />
-        {/* </ul> */}
+        <tbody>
+          <TreeRow data={data} />
+        </tbody>
       </table>
     </TreeProvider>
   );
 }
 
-function InnerTree({ data: { id, name, children } }: Props): JSX.Element {
+function TreeRow({ data: { id, name, children, count } }: Props): JSX.Element {
   const [isExpanded, setIsExpanded] = useState(false);
   const toggleIsExpanded = () => setIsExpanded((v) => !v);
   const hasChildren = children.length > 0;
@@ -63,7 +55,8 @@ function InnerTree({ data: { id, name, children } }: Props): JSX.Element {
         await queryClient.cancelQueries("tags");
         const existingData = queryClient.getQueryData("tags") as Tree;
 
-        const updatedData = removeNodes(existingData, id);
+        const updatedData = appendCountToTree(removeNodes(existingData, id));
+
         queryClient.setQueryData("tags", updatedData);
 
         return { existingData };
@@ -95,19 +88,14 @@ function InnerTree({ data: { id, name, children } }: Props): JSX.Element {
         </td>
         <td>
           {name}
-          {hasChildren ? ` (${children.length})` : null}
+          {count > 0 ? ` (${count})` : null}
         </td>
         <td>
-          <button
-            onClick={() => deleteMutation.mutate(id)}
-            // style={{ marginLeft: "auto" }}
-          >
-            Delete
-          </button>
+          <button onClick={() => deleteMutation.mutate(id)}>Delete</button>
         </td>
       </tr>
       {hasChildren && isExpanded
-        ? children.map((child) => <InnerTree key={child.id} data={child} />)
+        ? children.map((child) => <TreeRow key={child.id} data={child} />)
         : null}
     </>
   );
@@ -147,13 +135,16 @@ function BulkActions(): JSX.Element {
     }
   );
 
-  return selectedBranchNodes.length > 0 ? (
+  const isDisabled = selectedBranchNodes.length === 0;
+
+  return (
     <div>
-      <button onClick={() => bulkDeleteMutation.mutate(selectedBranchNodes)}>
+      <button
+        onClick={() => bulkDeleteMutation.mutate(selectedBranchNodes)}
+        disabled={isDisabled}
+      >
         Delete Selected
       </button>
     </div>
-  ) : (
-    <></>
   );
 }
