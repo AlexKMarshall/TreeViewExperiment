@@ -6,7 +6,7 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
 });
 
-const bigDoc = require("./data2L100N.json");
+const data = require("./data4L100N.json");
 
 // client.connect((err) => {
 //   const collection = client.db("test").collection("devices");
@@ -20,12 +20,12 @@ async function run() {
     const database = client.db("treeviewDB");
     const treview = database.collection("treeview");
 
-    const doc = {
-      name: "root",
-      children: [{ name: "child1" }, { name: "child2" }],
-    };
+    const result = await treview.replaceOne(
+      { id: "e8f9c4e1-f7ea-4b0f-9765-14e71f7e7895" },
+      data
+    );
 
-    const result = await treview.insertOne(bigDoc);
+    // const result = await treview.insertOne(bigDoc);
     console.log(result);
     // const movies = database.collection("movies");
     // // Query for a movie that has the title 'Back to the Future'
