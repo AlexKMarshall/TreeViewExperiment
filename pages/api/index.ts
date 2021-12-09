@@ -3,6 +3,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { MongoClient } from "mongodb";
 
+export const treeId = "1450e54e-e324-4361-8fb3-9bcc236ac9c3";
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -21,7 +23,7 @@ export default async function handler(
   const treeview = database.collection("treeview");
 
   const tree = await treeview.findOne({
-    id: "1450e54e-e324-4361-8fb3-9bcc236ac9c3",
+    id: treeId,
   });
 
   res.status(200).json(tree);

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { TreeProvider, useTree } from "./tree-view/context";
+import { TreeProvider, useTree } from "./context";
 import { useMutation, useQueryClient } from "react-query";
 
-import { Checkbox } from "./checkbox";
-import { Tree } from "../types";
-import { removeNodes } from "../utils";
+import { Checkbox } from "../checkbox";
+import { Tree } from "../../types";
+import { removeNodes } from "../../utils";
 
 type Props = {
   data: Tree;
@@ -12,7 +12,7 @@ type Props = {
 export function TreeView({ data }: Props): JSX.Element {
   return (
     <TreeProvider data={data}>
-      {/* <BulkActions /> */}
+      <BulkActions />
       <ul
         style={{
           display: "flex",

@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { MongoClient } from "mongodb";
 import { Tree } from "../../types";
 import { removeNodes } from "../../utils";
+import { treeId } from ".";
 
 export default async function handler(
   req: NextApiRequest,
@@ -27,7 +28,7 @@ export default async function handler(
   const treeview = database.collection("treeview");
 
   const query = {
-    id: "e8f9c4e1-f7ea-4b0f-9765-14e71f7e7895",
+    id: treeId,
   };
 
   const oldTree = (await treeview.findOne(query)) as unknown as Tree;
