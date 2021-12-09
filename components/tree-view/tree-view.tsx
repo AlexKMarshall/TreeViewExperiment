@@ -13,15 +13,27 @@ export function TreeView({ data }: Props): JSX.Element {
   return (
     <TreeProvider data={data}>
       <BulkActions />
-      <ul
+      <table style={{ width: "100%" }}>
+        <thead style={{ textAlign: "left" }}>
+          <tr>
+            <th>Selected?</th>
+            <th>Expand/Collapse</th>
+            <th>Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+
+        {/* <ul
         style={{
           display: "flex",
           flexDirection: "column",
           gap: "0.5rem",
         }}
-      >
+        > */}
         <InnerTree data={data} />
-      </ul>
+        {/* </ul> */}
+      </table>
     </TreeProvider>
   );
 }
@@ -66,36 +78,38 @@ function InnerTree({ data: { id, name, children } }: Props): JSX.Element {
   );
 
   return (
-    <li>
-      <div style={{ display: "flex", paddingRight: "4rem" }}>
-        <label>
+    <>
+      <tr>
+        <td>
           <Checkbox
             status={status}
             onChange={(newStatus) => {
               selectNode(id, newStatus);
             }}
           />
+        </td>
+        <td>
+          {hasChildren ? (
+            <button onClick={toggleIsExpanded}>{isExpanded ? "-" : "+"}</button>
+          ) : null}
+        </td>
+        <td>
           {name}
-        </label>
-        {hasChildren ? ` (${children.length})` : null}
-        {hasChildren ? (
-          <button onClick={toggleIsExpanded}>{isExpanded ? "-" : "+"}</button>
-        ) : null}
-        <button
-          onClick={() => deleteMutation.mutate(id)}
-          style={{ marginLeft: "auto" }}
-        >
-          Delete
-        </button>
-      </div>
-      {hasChildren && isExpanded ? (
-        <ul style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          {children.map((child) => (
-            <InnerTree key={child.id} data={child} />
-          ))}
-        </ul>
-      ) : null}
-    </li>
+          {hasChildren ? ` (${children.length})` : null}
+        </td>
+        <td>
+          <button
+            onClick={() => deleteMutation.mutate(id)}
+            // style={{ marginLeft: "auto" }}
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+      {hasChildren && isExpanded
+        ? children.map((child) => <InnerTree key={child.id} data={child} />)
+        : null}
+    </>
   );
 }
 
