@@ -33,19 +33,9 @@ export function TreeTable({ data }: Props): JSX.Element {
   );
 }
 
-function TreeRow({
-  data: { id, name, children, count, color },
-}: Props): JSX.Element {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const toggleIsExpanded = () => setIsExpanded((v) => !v);
-  const hasChildren = children.length > 0;
-  const { selected, selectNode } = useTree();
-  const status = selected[id] ?? "unchecked";
-
+function useDeleteNode() {
   const queryClient = useQueryClient();
-
-  // ideally this gets defined outside the component
-  const deleteMutation = useMutation(
+  return useMutation(
     (id: string) => {
       return fetch("/api/delete", {
         body: JSON.stringify({ id }),
@@ -76,6 +66,18 @@ function TreeRow({
       },
     }
   );
+}
+
+function TreeRow({
+  data: { id, name, children, count, color },
+}: Props): JSX.Element {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const toggleIsExpanded = () => setIsExpanded((v) => !v);
+  const hasChildren = children.length > 0;
+  const { selected, selectNode } = useTree();
+  const status = selected[id] ?? "unchecked";
+
+  const deleteMutation = useDeleteNode();
 
   return (
     <>
@@ -126,40 +128,7 @@ function LeafRow({
   const { selected, selectNode } = useTree();
   const status = selected[id] ?? "unchecked";
 
-  const queryClient = useQueryClient();
-
-  // ideally this gets defined outside the component
-  const deleteMutation = useMutation(
-    (id: string) => {
-      return fetch("/api/delete", {
-        body: JSON.stringify({ id }),
-        method: "DELETE",
-        headers: {
-          "content-type": "application/json",
-        },
-      });
-    },
-    {
-      onMutate: async (id) => {
-        await queryClient.cancelQueries("tags");
-        const existingData = queryClient.getQueryData("tags") as NewTree;
-
-        const updatedData = newAppendCountToTree(
-          newRemoveNodes(existingData, id)
-        );
-
-        queryClient.setQueryData("tags", updatedData);
-
-        return { existingData };
-      },
-      onError: (err, id, context) => {
-        queryClient.setQueryData("tags", (context as any).existingData);
-      },
-      onSettled: () => {
-        queryClient.invalidateQueries("tags");
-      },
-    }
-  );
+  const deleteMutation = useDeleteNode();
 
   return (
     <tr className={styles.leafRow}>
