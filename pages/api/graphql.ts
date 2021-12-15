@@ -6,11 +6,11 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-co
 import { MicroRequest } from "apollo-server-micro/dist/types";
 import { MongoDataSource } from "apollo-datasource-mongodb";
 import { clientPromise } from "../../mongodb-client";
-import { treeId } from ".";
 
 const typeDefs = gql`
   type Query {
     getTrees: [Tree]
+    getTree(id: ID): Tree
   }
 
   union TreeElement = Tree | Leaf
@@ -34,6 +34,9 @@ const resolvers = {
     getTrees: (a, b, { dataSources }) => {
       return dataSources.trees.getTrees();
     },
+    getTree: (parent, { id }, { dataSources }) => {
+      return dataSources.trees.getTree(id);
+    },
   },
   TreeElement: {
     __resolveType(obj, context, info) {
@@ -53,6 +56,9 @@ class Trees extends MongoDataSource {
     const trees = await this.collection.find();
     const unwrappedTrees = await trees.toArray();
     return unwrappedTrees;
+  }
+  getTree(id) {
+    return this.collection.findOne({ id });
   }
 }
 
