@@ -9,12 +9,7 @@ import { clientPromise } from "../../mongodb-client";
 import { treeId } from ".";
 
 const typeDefs = gql`
-  type User {
-    id: ID
-  }
-
   type Query {
-    getUser: User
     getTrees: [Tree]
   }
 
@@ -36,24 +31,19 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    getUser: () => {
-      return {
-        id: "Foo",
-      };
-    },
     getTrees: (a, b, { dataSources }) => {
       return dataSources.trees.getTrees();
     },
   },
   TreeElement: {
     __resolveType(obj, context, info) {
-      if (obj.kind === "tree") {
+      if (obj.type === "tree") {
         return "Tree";
       }
-      if (obj.kind === "leaf") {
+      if (obj.type === "leaf") {
         return "Leaf";
       }
-      return null;
+      return "Tree";
     },
   },
 };
@@ -78,18 +68,6 @@ const buildServer = async () => {
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
   });
 };
-
-// const apolloServer = new ApolloServer({
-//   typeDefs,
-//   resolvers,
-//   dataSources: () => ({
-//     trees: new Trees(
-//       clientPromise.then((client) => client.db().collection("treeview"))
-//     ),
-//   }),
-//   playground: true,
-//   plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
-// });
 
 export default async function handler(req: MicroRequest, res: any) {
   const apolloServer = await buildServer();
