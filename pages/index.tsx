@@ -23,7 +23,7 @@ function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <main style={{ maxWidth: 1200, padding: "2rem", marginInline: "auto" }}>
         <h1>Tree View</h1>
 
         {query.isLoading ? <div>Loading...</div> : null}

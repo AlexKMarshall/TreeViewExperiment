@@ -54,3 +54,15 @@ export function updateLeaf(
     }),
   };
 }
+
+export function arraymove<T>(
+  arr: T[],
+  fromIndex: number,
+  toIndex: number
+): T[] {
+  const arrCopy = [...arr];
+  const element = arrCopy[fromIndex];
+  arrCopy.splice(fromIndex, 1);
+  arrCopy.splice(toIndex, 0, element);
+  return arrCopy;
+}

@@ -8,7 +8,6 @@ import { useMutation, useQueryClient } from "react-query";
 
 import { Checkbox } from "../checkbox";
 import { Dialog } from "@reach/dialog";
-import { removeNodes } from "../../utils";
 import styles from "./table.module.css";
 
 type Props = {

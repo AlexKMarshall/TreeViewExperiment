@@ -14,6 +14,9 @@ export default async function handler(
   const client = await clientPromise;
   const database = client.db("treeviewDB");
   const treeview = database.collection("treeview");
+  // const allTrees = await treeview.find();
+  // const unwrappedTrees = await allTrees.toArray();
+  // console.log(unwrappedTrees);
 
   const tree = (await treeview.findOne({
     id: treeId,
